@@ -94,11 +94,20 @@ end
 
 def email(id, address)
   require 'pony'
-  file = File.new(generate_jruby_excel(id))
+  expense_spreadsheet = File.new(generate_jruby_excel(id))
+  attachments = {"expense.xls" => expense_spreadsheet.read}
+  expense = get_col.find("_id" => BSON::ObjectId(id)).to_a[0]  
+  
+  expense["receipts"].each_with_index do |receipt, index|
+    image_encoded = receipt["image"]
+    image_decoded = Base64.decode64 image_encoded
+    attachments["receipt_#{index}.png"] = image_decoded
+  end
+  
   Pony.mail(
       :from => "testing",
       :to => address,
-      :attachments => {"expenses.xls" => file.read},
+      :attachments => attachments,
       :subject => "Expenses",
       :body => "Please find attached my expenses",
       :port => '587',
@@ -183,7 +192,7 @@ def generate_jruby_excel(id)
       signature = Tempfile.new(['signature', '.png'])
       signature.write(image_signature)
       signature.rewind
-      writable_image = Java::jxl.write.WritableImage.new(SIGNATURE_COL, SIGNATURE_ROW, 2, 1, java.io.File.new(signature.path))
+      writable_image = Java::jxl.write.WritableImage.new(SIGNATURE_COL, SIGNATURE_ROW, 1, 1, java.io.File.new(signature.path))
       sheet.addImage(writable_image)
     end
  
