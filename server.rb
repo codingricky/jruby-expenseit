@@ -176,8 +176,8 @@ def generate_jruby_excel(id)
       sheet.addCell(amount_number)
     end
     
-    if (expense["image"])
-      image_signature = Base64.decode64(expense["image"])
+    if (expense["signature"])
+      image_signature = Base64.decode64(expense["signature"])
 
       signature = Tempfile.new(['signature', '.png'])
       signature.write(image_signature)
