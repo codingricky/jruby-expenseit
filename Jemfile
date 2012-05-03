@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-
+gem 'jruby-openssl'
 gem 'sinatra'
 gem 'trinidad'
 gem 'json'
