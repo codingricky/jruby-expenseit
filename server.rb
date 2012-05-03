@@ -79,7 +79,7 @@ delete '/expenses' do
 end
 
 get '/expense/:id/excel.xls' do |id|
-  send_file(generate_excel(id).path)  
+  send_file(generate_jruby_excel(id))  
 end
 
 post '/expense/:id/email' do |id|
