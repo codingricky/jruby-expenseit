@@ -15,7 +15,8 @@ EXPENSE_START_ROW = 13
 
 NAME_COL = 1
 NAME_ROW = 9
-
+SIGNATURE_COL = 1
+SIGNATURE_ROW = 23
 get '/' do
   puts "Show expenses"
   coll = get_col
