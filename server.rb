@@ -3,6 +3,7 @@ require 'json'
 require 'mongo'
 require 'base64'
 require 'spreadsheet'
+require 'jxl.jar'
 
 DATE_COL=0
 DESCRIPTION_COL=1
@@ -90,7 +91,7 @@ end
 
 def email(id, address)
   require 'pony'
-  file = generate_excel(id)
+  file = File.new(generate_jruby_excel(id))
   Pony.mail(
       :from => "testing",
       :to => address,
@@ -141,4 +142,53 @@ def get_col
     db = connection.db("mydb")
     db["expenses"]
   end
+end
+
+def generate_jruby_excel(id)
+  expense = coll.find("_id" => BSON::ObjectId(id)).to_a[0]
+  
+  writeable_workbook = nil
+  begin
+    template = java.io.File.new("template.xls")
+    temp_file =	java.io.File.createTempFile(java.lang.String.valueOf(java.lang.System.currentTimeMillis()), ".xls")
+    temp_file.deleteOnExit()
+    workbook = Java::jxl.Workbook.getWorkbook(template)
+    writeable_workbook =  Java::jxl.Workbook.createWorkbook(temp_file, workbook)
+    sheet = writeable_workbook.getSheet(0)
+    name_label = Java::jxl.write.Label.new(NAME_COL, NAME_ROW, "John Smith")
+	  sheet.addCell(name_label)
+	
+    expense["receipts"].each_with_index do |receipt, i|
+      date_label = Java::jxl.write.Label.new(DATE_COL, EXPENSE_START_ROW + i, receipt["date"])
+      description_label = Java::jxl.write.Label.new(DESCRIPTION_COL, EXPENSE_START_ROW + i, receipt["description"])
+      category_label = Java::jxl.write.Label.new(CATEGORY_COL, EXPENSE_START_ROW + i, receipt["category"])
+      client_label = Java::jxl.write.Label.new(CLIENT_COL, EXPENSE_START_ROW + i, receipt["client"])
+    
+      amount_in_dollars = receipt["amount_in_cents"] ? receipt["amount_in_cents"].to_f/100 : receipt["amountInCents"].to_f/100
+      amount_number = Java::jxl.write.Number.new(TOTAL_COL, EXPENSE_START_ROW + i, amount_in_dollars)
+      
+      sheet.addCell(date_label)
+      sheet.addCell(description_label)
+      sheet.addCell(category_label)
+      sheet.addCell(client_label)
+      sheet.addCell(amount_number)
+    end
+    
+    if (expense["image"])
+      image_signature = Base64.decode64(expense["image"])
+
+      signature = Tempfile.new(['signature', '.png'])
+      signature.write(image_signature)
+      signature.rewind
+      writable_image = Java::jxl.write.WritableImage.new(SIGNATURE_COL, SIGNATURE_ROW, 2, 1, java.io.File.new(signature.path))
+      sheet.addImage(writable_image)
+    end
+ 
+  ensure
+    if (writeable_workbook)
+      writeable_workbook.write
+      writeable_workbook.close
+    end
+  end
+  temp_file.path
 end
