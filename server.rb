@@ -31,6 +31,8 @@ post '/expense' do
   expense = JSON.parse(request.body.read)
   coll = get_col
   id = coll.insert(expense)
+  # email(id, "ricky@dius.com.au")
+  
   id.to_s
 end
 
@@ -145,7 +147,7 @@ def get_col
 end
 
 def generate_jruby_excel(id)
-  expense = coll.find("_id" => BSON::ObjectId(id)).to_a[0]
+  expense = get_col.find("_id" => BSON::ObjectId(id)).to_a[0]
   
   writeable_workbook = nil
   begin
