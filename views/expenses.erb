@@ -1,0 +1,42 @@
+<h1>Listing Expenses</h1>
+
+<% @expenses.each do |expense| %> 
+<h2>Name: <%= expense['name'] %></h2>
+<table>
+  <tr>
+    <th>Receipt</th>
+    <th>Client</th>
+    <th>Category</th>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Description</th>
+    <th>Image</th>
+  </tr>
+ <% i = 0 %>
+<% expense['receipts'].each do |receipt| %>
+
+  <tr>
+	<td><%= i += 1 %>
+    <td><%= receipt['client'] %></td>
+    <td><%= receipt['category'] %></td>
+    <td><%= receipt['date'] %></td>
+    <td>$<%= receipt["amount_in_cents"] ? receipt["amount_in_cents"].to_f/100 : receipt["amountInCents"].to_f/100 %></td>
+    <td><%= receipt['description'] %></td>
+    <td>
+	   <% if receipt['image'] %>
+	   <a href="/expense/<%=expense['_id']%>/receipts/<%=i-1%>/image"><img src="data:image/png;base64,<%= receipt['image'] %>"/ alt="image"></a>
+	   <% end %>
+	</td>
+  </tr>
+<% end %>
+</table>
+<p>
+	<h3>Actions</h3>
+	<a href="/expense/<%=expense['_id']%>/excel.xls">Excel Spreadsheet</a>
+	<form method="post" action="/expense/<%=expense['_id']%>/email">
+		Email: <input type="text" name="emailAddress"/><input type="submit"/>
+	</form>
+</p>
+<% end %>
+ 
+<br />
