@@ -17,6 +17,13 @@ NAME_COL = 1
 NAME_ROW = 9
 SIGNATURE_COL = 1
 SIGNATURE_ROW = 23
+
+TOP_DATE_COL = 4
+TOP_DATE_ROW = 9
+
+BOTTOM_DATE_COL = 4
+BOTTOM_DATE_ROW = 23
+
 get '/' do
   puts "Show expenses"
   coll = get_col
@@ -169,6 +176,13 @@ def generate_jruby_excel(id)
     sheet = writeable_workbook.getSheet(0)
     name_label = Java::jxl.write.Label.new(NAME_COL, NAME_ROW, expense["name"])
 	  sheet.addCell(name_label)
+	  
+	  date = Time.now.strftime('%d/%m/%Y')
+	  top_date_label = Java::jxl.write.Label.new(TOP_DATE_COL, TOP_DATE_ROW, date)
+	  sheet.addCell(top_date_label)
+	  
+	  bottom_date_label = Java::jxl.write.Label.new(BOTTOM_DATE_COL, BOTTOM_DATE_ROW, date)
+    sheet.addCell(bottom_date_label)
 	
     expense["receipts"].each_with_index do |receipt, i|
       date_label = Java::jxl.write.Label.new(DATE_COL, EXPENSE_START_ROW + i, receipt["date"])
