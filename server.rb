@@ -167,7 +167,7 @@ def generate_jruby_excel(id)
     workbook = Java::jxl.Workbook.getWorkbook(template)
     writeable_workbook =  Java::jxl.Workbook.createWorkbook(temp_file, workbook)
     sheet = writeable_workbook.getSheet(0)
-    name_label = Java::jxl.write.Label.new(NAME_COL, NAME_ROW, "John Smith")
+    name_label = Java::jxl.write.Label.new(NAME_COL, NAME_ROW, expense["name"])
 	  sheet.addCell(name_label)
 	
     expense["receipts"].each_with_index do |receipt, i|
