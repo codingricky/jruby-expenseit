@@ -192,7 +192,7 @@ def generate_jruby_excel(id)
       signature = Tempfile.new(['signature', '.png'])
       signature.write(image_signature)
       signature.rewind
-      writable_image = Java::jxl.write.WritableImage.new(SIGNATURE_COL, SIGNATURE_ROW, 1, 1, java.io.File.new(signature.path))
+      writable_image = Java::jxl.write.WritableImage.new(SIGNATURE_COL, SIGNATURE_ROW, 2, 2, java.io.File.new(signature.path))
       sheet.addImage(writable_image)
     end
  
